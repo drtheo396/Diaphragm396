@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedMCQ - Medical Question Bank</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6fb;
+    color: #172033;
+}
+
+header {
+    background: #142b49;
+    color: white;
+    padding: 22px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin-bottom: 0;
+    color: #cbd8e8;
+}
+
+.container {
+    max-width: 850px;
+    margin: 25px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px #0000000d;
+}
+
+h2 {
+    font-size: 19px;
+    margin-top: 0;
+}
+
+select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #ccd3df;
+    border-radius: 8px;
+    font-size: 16px;
+    background: white;
+}
+
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-bottom: 15px;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 15px;
+    background: #e8eef7;
+    color: #142b49;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #d2e1f5;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 13px;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: #1769aa;
+}
+
+.start {
+    width: 100%;
+    padding: 16px;
+    background: #1769aa;
+    color: white;
+    font-size: 17px;
+    margin-top: 10px;
+}
+
+.start:hover {
+    background: #10538b;
+}
+
+#result {
+    margin-top: 15px;
+    padding: 15px;
+    background: #eaf3ff;
+    border-radius: 8px;
+    display: none;
+    line-height: 1.7;
+}
+
+@media(max-width:500px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>MedMCQ</h1>
+    <p>Your Medical Entrance Question Bank</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+    <h2>1. Select Examination</h2>
+    <select id="exam">
+        <option value="">Choose Examination</option>
+        <option value="NEET-PG">NEET-PG</option>
+        <option value="INI-CET">INI-CET</option>
+        <option value="Both">Both Examinations</option>
+    </select>
+</div>
+
+<div class="card">
+    <h2>2. Select Subjects</h2>
+
+    <div class="buttons">
+        <button onclick="selectCount(1)">1 Subject</button>
+        <button onclick="selectCount(2)">2 Subjects</button>
+        <button onclick="selectCount(4)">4 Subjects</button>
+        <button onclick="selectCount(8)">8 Subjects</button>
+        <button onclick="selectAll()">All 19</button>
+        <button onclick="clearSubjects()">Clear</button>
+    </div>
+
+    <div class="grid" id="subjects"></div>
+
+    <p id="subjectCount">0 subjects selected</p>
+</div>
+
+<div class="card">
+    <h2>3. Select Examination Years</h2>
+
+    <div class="buttons">
+        <button onclick="selectYears(2017,2026)">All Years</button>
+        <button onclick="selectYears(2022,2026)">Last 5 Years</button>
+        <button onclick="clearYears()">Clear</button>
+    </div>
+
+    <div class="grid" id="years"></div>
+
+    <p id="yearCount">0 years selected</p>
+</div>
+
+<div class="card">
+    <button class="start" onclick="startPractice()">
+        START PRACTICE
+    </button>
+
+    <div id="result"></div>
+</div>
+
+</div>
+
+<script>
+
+const subjectList = [
+"Anatomy",
+"Physiology",
+"Biochemistry",
+"Pathology",
+"Pharmacology",
+"Microbiology",
+"PSM",
+"Forensic Medicine",
+"ENT",
+"Ophthalmology",
+"Medicine",
+"Surgery",
+"Obstetrics & Gynaecology",
+"Pediatrics",
+"Orthopaedics",
+"Dermatology",
+"Psychiatry",
+"Anaesthesia",
+"Radiology"
+];
+
+const subjectBox = document.getElementById("subjects");
+
+subjectList.forEach(subject => {
+    subjectBox.innerHTML += `
+        <label>
+            <input type="checkbox" class="subject" value="${subject}">
+            ${subject}
+        </label>
+    `;
+});
+
+const yearBox = document.getElementById("years");
+
+for(let year=2017; year<=2026; year++) {
+    yearBox.innerHTML += `
+        <label>
+            <input type="checkbox" class="year" value="${year}">
+            ${year}
+        </label>
+    `;
+}
+
+function updateCounts() {
+    let s = document.querySelectorAll(".subject:checked").length;
+    let y = document.querySelectorAll(".year:checked").length;
+
+    document.getElementById("subjectCount").innerText =
+        s + " subjects selected";
+
+    document.getElementById("yearCount").innerText =
+        y + " years selected";
+}
+
+function selectCount(count) {
+    let boxes = document.querySelectorAll(".subject");
+
+    boxes.forEach((box,index) => {
+        box.checked = index < count;
+    });
+
+    updateCounts();
+}
+
+function selectAll() {
+    document.querySelectorAll(".subject").forEach(box => {
+        box.checked = true;
+    });
+    updateCounts();
+}
+
+function clearSubjects() {
+    document.querySelectorAll(".subject").forEach(box => {
+        box.checked = false;
+    });
+    updateCounts();
+}
+
+function selectYears(start,end) {
+    document.querySelectorAll(".year").forEach(box => {
+        let year = Number(box.value);
+        box.checked = year >= start && year <= end;
+    });
+    updateCounts();
+}
+
+function clearYears() {
+    document.querySelectorAll(".year").forEach(box => {
+        box.checked = false;
+    });
+    updateCounts();
+}
+
+document.addEventListener("change", updateCounts);
+
+function startPractice() {
+
+    let exam = document.getElementById("exam").value;
+
+    let subjects = [...document.querySelectorAll(".subject:checked")]
+        .map(box => box.value);
+
+    let years = [...document.querySelectorAll(".year:checked")]
+        .map(box => box.value);
+
+    if(!exam || subjects.length === 0 || years.length === 0) {
+        alert("Please select examination, subjects and years.");
+        return;
+    }
+
+    let result = document.getElementById("result");
+
+    result.style.display = "block";
+
+    result.innerHTML = `
+        <h3>Your Practice Selection</h3>
+        <b>Examination:</b> ${exam}<br>
+        <b>Subjects:</b> ${subjects.join(", ")}<br>
+        <b>Years:</b> ${years.join(", ")}<br><br>
+        Your selections are ready.
+        Question database will be connected in the next stages.
+    `;
+}
+
+</script>
+
+</body>
+</html>
