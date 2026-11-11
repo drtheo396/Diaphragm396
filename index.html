@@ -2,329 +2,344 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MedMCQ - Medical Question Bank</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10243e">
+<title>MedMCQ | Medical Entrance Practice</title>
 <style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f6fb;
-    color: #172033;
-}
-
-header {
-    background: #142b49;
-    color: white;
-    padding: 22px;
-    text-align: center;
-}
-
-header h1 {
-    margin: 0;
-    font-size: 28px;
-}
-
-header p {
-    margin-bottom: 0;
-    color: #cbd8e8;
-}
-
-.container {
-    max-width: 850px;
-    margin: 25px auto;
-    padding: 20px;
-}
-
-.card {
-    background: white;
-    padding: 22px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px #0000000d;
-}
-
-h2 {
-    font-size: 19px;
-    margin-top: 0;
-}
-
-select {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid #ccd3df;
-    border-radius: 8px;
-    font-size: 16px;
-    background: white;
-}
-
-.buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    margin-bottom: 15px;
-}
-
-button {
-    cursor: pointer;
-    border: none;
-    border-radius: 7px;
-    padding: 10px 15px;
-    background: #e8eef7;
-    color: #142b49;
-    font-weight: bold;
-}
-
-button:hover {
-    background: #d2e1f5;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 13px;
-}
-
-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-input[type="checkbox"] {
-    width: 17px;
-    height: 17px;
-    accent-color: #1769aa;
-}
-
-.start {
-    width: 100%;
-    padding: 16px;
-    background: #1769aa;
-    color: white;
-    font-size: 17px;
-    margin-top: 10px;
-}
-
-.start:hover {
-    background: #10538b;
-}
-
-#result {
-    margin-top: 15px;
-    padding: 15px;
-    background: #eaf3ff;
-    border-radius: 8px;
-    display: none;
-    line-height: 1.7;
-}
-
-@media(max-width:500px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .container {
-        padding: 12px;
-    }
-}
+:root{--navy:#10243e;--blue:#2563eb;--bg:#f4f7fb;--line:#e2e8f0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:#172033;font-family:Arial,sans-serif}
+header{background:linear-gradient(120deg,#10243e,#1d4773);color:white;padding:25px 15px;text-align:center}
+header h1{margin:0;font-size:28px}
+header p{margin:7px 0 0;color:#d5e2f2}
+.container{max-width:900px;margin:22px auto;padding:0 14px}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:15px;box-shadow:0 4px 16px #00000008}
+h2{font-size:18px;margin:0 0 15px}
+select{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:9px;background:white;font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.grid label{display:flex;align-items:center;gap:9px;font-size:14px}
+input[type=checkbox]{width:17px;height:17px;accent-color:var(--blue)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+button{border:0;border-radius:9px;padding:11px 14px;background:#eaf0f8;color:#173454;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:var(--blue);color:white}
+.wide{width:100%;padding:15px;font-size:16px}
+.hint,#status{color:#64748b;font-size:13px}
+#practice{display:none}
+.qtop{display:flex;justify-content:space-between;color:#64748b;font-size:13px;margin-bottom:14px}
+.qtext{font-size:16px;line-height:1.7;white-space:pre-wrap}
+.option{display:flex;gap:10px;align-items:flex-start;padding:13px;border:1px solid var(--line);border-radius:10px;margin:9px 0;cursor:pointer;line-height:1.5}
+.option:has(input:checked){border-color:var(--blue);background:#eff6ff}
+.option input{margin-top:4px;accent-color:var(--blue)}
+.qimage{display:block;max-width:100%;max-height:420px;object-fit:contain;margin:15px auto;border-radius:10px}
+.feedback{padding:13px;border-radius:10px;margin-top:14px;line-height:1.6;font-size:14px}
+.correct{background:#ecfdf3;color:#166534}
+.incorrect{background:#fef2f2;color:#991b1b}
+.nav{display:flex;gap:9px;margin-top:16px}
+.nav button{flex:1}
+@media(max-width:540px){.container{padding:0 10px}.card{padding:16px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
-
 <body>
-
 <header>
-    <h1>MedMCQ</h1>
-    <p>Your Medical Entrance Question Bank</p>
+<h1>MedMCQ</h1>
+<p>Focused practice for NEET-PG &amp; INI-CET</p>
 </header>
 
-<div class="container">
-
+<main class="container">
+<section id="filters">
 <div class="card">
-    <h2>1. Select Examination</h2>
-    <select id="exam">
-        <option value="">Choose Examination</option>
-        <option value="NEET-PG">NEET-PG</option>
-        <option value="INI-CET">INI-CET</option>
-        <option value="Both">Both Examinations</option>
-    </select>
-</div>
-
-<div class="card">
-    <h2>2. Select Subjects</h2>
-
-    <div class="buttons">
-        <button onclick="selectCount(1)">1 Subject</button>
-        <button onclick="selectCount(2)">2 Subjects</button>
-        <button onclick="selectCount(4)">4 Subjects</button>
-        <button onclick="selectCount(8)">8 Subjects</button>
-        <button onclick="selectAll()">All 19</button>
-        <button onclick="clearSubjects()">Clear</button>
-    </div>
-
-    <div class="grid" id="subjects"></div>
-
-    <p id="subjectCount">0 subjects selected</p>
+<h2>1. Select Examination</h2>
+<select id="exam">
+<option value="">Choose Examination</option>
+<option value="NEET-PG">NEET-PG</option>
+<option value="INI-CET">INI-CET</option>
+<option value="Both">Both Examinations</option>
+</select>
 </div>
 
 <div class="card">
-    <h2>3. Select Examination Years</h2>
-
-    <div class="buttons">
-        <button onclick="selectYears(2017,2026)">All Years</button>
-        <button onclick="selectYears(2022,2026)">Last 5 Years</button>
-        <button onclick="clearYears()">Clear</button>
-    </div>
-
-    <div class="grid" id="years"></div>
-
-    <p id="yearCount">0 years selected</p>
+<h2>2. Select Subjects</h2>
+<div class="tools">
+<button onclick="selectCount(1)">1 Subject</button>
+<button onclick="selectCount(2)">2 Subjects</button>
+<button onclick="selectCount(4)">4 Subjects</button>
+<button onclick="selectCount(8)">8 Subjects</button>
+<button onclick="selectAll()">All 19</button>
+<button onclick="clearSubjects()">Clear</button>
+</div>
+<div class="grid" id="subjects"></div>
+<p class="hint" id="subjectCount">0 subjects selected</p>
 </div>
 
 <div class="card">
-    <button class="start" onclick="startPractice()">
-        START PRACTICE
-    </button>
-
-    <div id="result"></div>
+<h2>3. Select Examination Years</h2>
+<div class="tools">
+<button onclick="selectYears(2017,2026)">All Years</button>
+<button onclick="selectYears(2022,2026)">Last 5 Years</button>
+<button onclick="clearYears()">Clear</button>
+</div>
+<div class="grid" id="years"></div>
+<p class="hint" id="yearCount">0 years selected</p>
 </div>
 
+<div class="card">
+<button class="primary wide" id="startBtn" onclick="startPractice()">START PRACTICE</button>
 </div>
+</section>
 
+<section id="practice" class="card">
+<div class="qtop">
+<span id="progress"></span>
+<span id="examTag"></span>
+</div>
+<h2 id="question" class="qtext"></h2>
+<div id="images"></div>
+<div id="options"></div>
+<div id="feedback"></div>
+<div class="nav">
+<button id="prevBtn" onclick="move(-1)">← Previous</button>
+<button class="primary" id="checkBtn" onclick="checkAnswer()">Check Answer</button>
+<button id="nextBtn" onclick="move(1)">Next →</button>
+</div>
+<p class="hint" id="questionMeta"></p>
+</section>
+<p id="status" role="status"></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL="https://cdpunqgwxnajuopzqkmw.supabase.co";
+const SUPABASE_KEY="sb_publishable_eQ8g81J4yDSI3KSCHVE6dA_auwEFRpa";
+const BUCKET="question images";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const subjectList = [
-"Anatomy",
-"Physiology",
-"Biochemistry",
-"Pathology",
-"Pharmacology",
-"Microbiology",
-"PSM",
-"Forensic Medicine",
-"ENT",
-"Ophthalmology",
-"Medicine",
-"Surgery",
-"Obstetrics & Gynaecology",
-"Pediatrics",
-"Orthopaedics",
-"Dermatology",
-"Psychiatry",
-"Anaesthesia",
-"Radiology"
+const subjectList=[
+["Anatomy",1],["Physiology",2],["Biochemistry",3],
+["Pathology",4],["Pharmacology",5],["Microbiology",6],
+["PSM",7],["Forensic Medicine",8],["ENT",9],
+["Ophthalmology",10],["Medicine",11],["Surgery",12],
+["Obstetrics & Gynaecology",13],["Pediatrics",14],
+["Orthopaedics",15],["Dermatology",16],["Psychiatry",17],
+["Anaesthesia",18],["Radiology",19]
 ];
 
-const subjectBox = document.getElementById("subjects");
+let questions=[];
+let index=0;
+let checked={};
 
-subjectList.forEach(subject => {
-    subjectBox.innerHTML += `
-        <label>
-            <input type="checkbox" class="subject" value="${subject}">
-            ${subject}
-        </label>
-    `;
+const subjectBox=document.getElementById("subjects");
+const yearBox=document.getElementById("years");
+
+subjectList.forEach(([name,id])=>{
+ const label=document.createElement("label");
+ const input=document.createElement("input");
+ input.type="checkbox";
+ input.className="subject";
+ input.value=id;
+ label.append(input,document.createTextNode(name));
+ subjectBox.append(label);
 });
 
-const yearBox = document.getElementById("years");
-
-for(let year=2017; year<=2026; year++) {
-    yearBox.innerHTML += `
-        <label>
-            <input type="checkbox" class="year" value="${year}">
-            ${year}
-        </label>
-    `;
+for(let year=2017;year<=2026;year++){
+ const label=document.createElement("label");
+ const input=document.createElement("input");
+ input.type="checkbox";
+ input.className="year";
+ input.value=year;
+ label.append(input,document.createTextNode(year));
+ yearBox.append(label);
 }
 
-function updateCounts() {
-    let s = document.querySelectorAll(".subject:checked").length;
-    let y = document.querySelectorAll(".year:checked").length;
-
-    document.getElementById("subjectCount").innerText =
-        s + " subjects selected";
-
-    document.getElementById("yearCount").innerText =
-        y + " years selected";
+function updateCounts(){
+ document.getElementById("subjectCount").textContent=
+ document.querySelectorAll(".subject:checked").length+" subjects selected";
+ document.getElementById("yearCount").textContent=
+ document.querySelectorAll(".year:checked").length+" years selected";
 }
 
-function selectCount(count) {
-    let boxes = document.querySelectorAll(".subject");
+function selectCount(n){
+ document.querySelectorAll(".subject").forEach((b,i)=>b.checked=i<n);
+ updateCounts();
+}
+function selectAll(){
+ document.querySelectorAll(".subject").forEach(b=>b.checked=true);
+ updateCounts();
+}
+function clearSubjects(){
+ document.querySelectorAll(".subject").forEach(b=>b.checked=false);
+ updateCounts();
+}
+function selectYears(a,b){
+ document.querySelectorAll(".year").forEach(x=>x.checked=+x.value>=a&&+x.value<=b);
+ updateCounts();
+}
+function clearYears(){
+ document.querySelectorAll(".year").forEach(x=>x.checked=false);
+ updateCounts();
+}
+document.addEventListener("change",updateCounts);
 
-    boxes.forEach((box,index) => {
-        box.checked = index < count;
-    });
-
-    updateCounts();
+function status(message){
+ document.getElementById("status").textContent=message;
 }
 
-function selectAll() {
-    document.querySelectorAll(".subject").forEach(box => {
-        box.checked = true;
-    });
-    updateCounts();
+async function startPractice(){
+ const exam=document.getElementById("exam").value;
+ const subjectIds=[...document.querySelectorAll(".subject:checked")].map(x=>Number(x.value));
+ const selectedYears=[...document.querySelectorAll(".year:checked")].map(x=>Number(x.value));
+
+ if(!exam||!subjectIds.length||!selectedYears.length){
+  alert("Please select examination, subjects and years.");
+  return;
+ }
+
+ const btn=document.getElementById("startBtn");
+ btn.disabled=true;
+ btn.textContent="Loading Questions...";
+ status("Connecting to question bank...");
+
+ try{
+  let query=db.from("questions")
+   .select("id,exam,exam_year,subject_id,topic,question_text,options,correct_answer,answer_format,explanation,image_file,image_status")
+   .in("subject_id",subjectIds)
+   .in("exam_year",selectedYears)
+   .order("exam_year",{ascending:false})
+   .limit(500);
+
+  if(exam!=="Both") query=query.eq("exam",exam);
+  else query=query.in("exam",["NEET-PG","INI-CET"]);
+
+  const {data,error}=await query;
+  if(error) throw error;
+
+  if(!data||!data.length){
+   status("No questions found. Try different filters.");
+   return;
+  }
+
+  const ids=data.map(q=>q.id);
+  const {data:media,error:mediaError}=await db.from("question_media")
+   .select("question_id,file_path,media_type,display_order")
+   .in("question_id",ids)
+   .order("display_order");
+
+  if(mediaError) console.warn(mediaError.message);
+
+  const mediaMap={};
+  (media||[]).forEach(m=>{
+   if(!mediaMap[m.question_id]) mediaMap[m.question_id]=[];
+   mediaMap[m.question_id].push(m);
+  });
+
+  questions=data.map(q=>({...q,media:mediaMap[q.id]||[]}));
+  index=0;
+  checked={};
+
+  document.getElementById("filters").style.display="none";
+  document.getElementById("practice").style.display="block";
+  status(questions.length+" questions loaded.");
+  renderQuestion();
+
+ }catch(e){
+  console.error(e);
+  status("Could not load questions: "+e.message);
+ }finally{
+  btn.disabled=false;
+  btn.textContent="START PRACTICE";
+ }
 }
 
-function clearSubjects() {
-    document.querySelectorAll(".subject").forEach(box => {
-        box.checked = false;
-    });
-    updateCounts();
+function getOptions(q){
+ let o=q.options;
+ if(typeof o==="string"){
+  try{o=JSON.parse(o)}catch(e){}
+ }
+ if(Array.isArray(o)) return o;
+ if(o&&typeof o==="object") return Object.values(o);
+ return [];
 }
 
-function selectYears(start,end) {
-    document.querySelectorAll(".year").forEach(box => {
-        let year = Number(box.value);
-        box.checked = year >= start && year <= end;
-    });
-    updateCounts();
+function renderQuestion(){
+ const q=questions[index];
+
+ document.getElementById("progress").textContent=
+ "Question "+(index+1)+" of "+questions.length;
+ document.getElementById("examTag").textContent=q.exam+" · "+q.exam_year;
+ document.getElementById("question").textContent=q.question_text||"Question unavailable";
+
+ const media=q.media.length?q.media:[];
+ document.getElementById("images").innerHTML=media.map(m=>{
+  const path=m.file_path.split("/").map(encodeURIComponent).join("/");
+  return '<img class="qimage" loading="lazy" alt="Question image" src="'+SUPABASE_URL+'/storage/v1/object/public/'+encodeURIComponent(BUCKET)+'/'+path+'">';
+ }).join("");
+
+ const chosen=checked[q.id]?.choice;
+ document.getElementById("options").innerHTML=getOptions(q).map((opt,i)=>
+  '<label class="option"><input type="radio" name="answer" value="'+i+'" '+(chosen===i?"checked":"")+' '+(checked[q.id]?"disabled":"")+'><span></span></label>'
+ ).join("");
+
+ const optionLabels=document.querySelectorAll("#options .option span");
+ getOptions(q).forEach((opt,i)=>optionLabels[i].textContent=opt);
+
+ document.getElementById("feedback").innerHTML=
+ checked[q.id]?feedbackHTML(q):"";
+
+ document.getElementById("checkBtn").disabled=!!checked[q.id];
+ document.getElementById("prevBtn").disabled=index===0;
+ document.getElementById("nextBtn").textContent=
+ index===questions.length-1?"Finish":"Next →";
+
+ document.getElementById("questionMeta").textContent=q.topic||"";
 }
 
-function clearYears() {
-    document.querySelectorAll(".year").forEach(box => {
-        box.checked = false;
-    });
-    updateCounts();
+function isCorrect(q,choice){
+ const opts=getOptions(q);
+ const selected=String(opts[choice]).trim().toLowerCase();
+ const answer=q.correct_answer;
+
+ if(Array.isArray(answer))
+  return answer.some(a=>String(a).trim().toLowerCase()===selected);
+
+ if(answer&&typeof answer==="object")
+  return Object.values(answer).some(a=>String(a).trim().toLowerCase()===selected);
+
+ return String(answer??"").trim().toLowerCase()===selected;
 }
 
-document.addEventListener("change", updateCounts);
-
-function startPractice() {
-
-    let exam = document.getElementById("exam").value;
-
-    let subjects = [...document.querySelectorAll(".subject:checked")]
-        .map(box => box.value);
-
-    let years = [...document.querySelectorAll(".year:checked")]
-        .map(box => box.value);
-
-    if(!exam || subjects.length === 0 || years.length === 0) {
-        alert("Please select examination, subjects and years.");
-        return;
-    }
-
-    let result = document.getElementById("result");
-
-    result.style.display = "block";
-
-    result.innerHTML = `
-        <h3>Your Practice Selection</h3>
-        <b>Examination:</b> ${exam}<br>
-        <b>Subjects:</b> ${subjects.join(", ")}<br>
-        <b>Years:</b> ${years.join(", ")}<br><br>
-        Your selections are ready.
-        Question database will be connected in the next stages.
-    `;
+function feedbackHTML(q){
+ const ok=checked[q.id].correct;
+ return '<div class="feedback '+(ok?"correct":"incorrect")+'"><strong>'+
+ (ok?"Correct":"Incorrect")+'</strong><br>Correct answer: '+
+ String(q.correct_answer??"Not provided")+
+ (q.explanation?'<br><br>'+q.explanation:"")+'</div>';
 }
 
+function checkAnswer(){
+ const q=questions[index];
+ const selected=document.querySelector('input[name="answer"]:checked');
+ if(!selected){
+  alert("Select an option first.");
+  return;
+ }
+ const choice=Number(selected.value);
+ checked[q.id]={choice,correct:isCorrect(q,choice)};
+ renderQuestion();
+}
+
+function move(step){
+ if(index===questions.length-1&&step===1){
+  const total=Object.keys(checked).length;
+  const correct=Object.values(checked).filter(x=>x.correct).length;
+  document.getElementById("practice").innerHTML=
+   '<h2>Practice Completed</h2><p>Attempted: '+total+
+   ' / '+questions.length+'</p><p>Correct answers: <strong>'+
+   correct+'</strong></p><button class="primary wide" onclick="location.reload()">New Practice</button>';
+  return;
+ }
+ index=Math.max(0,Math.min(questions.length-1,index+step));
+ renderQuestion();
+}
 </script>
-
 </body>
 </html>
