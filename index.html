@@ -270,14 +270,18 @@ function renderQuestion(){
   return '<img class="qimage" loading="lazy" alt="Question image" src="'+SUPABASE_URL+'/storage/v1/object/public/'+encodeURIComponent(BUCKET)+'/'+path+'">';
  }).join("");
 
- const chosen=checked[q.id]?.choice;
+ const chosen=checked[q.id]?.choice ?? selectedAnswers[q.id];
  document.getElementById("options").innerHTML=getOptions(q).map((opt,i)=>
   '<label class="option"><input type="radio" name="answer" value="'+i+'" '+(chosen===i?"checked":"")+' '+(checked[q.id]?"disabled":"")+'><span></span></label>'
  ).join("");
 
  const optionLabels=document.querySelectorAll("#options .option span");
  getOptions(q).forEach((opt,i)=>optionLabels[i].textContent=opt);
-
+document.querySelectorAll('input[name="answer"]').forEach(input=>{
+ input.addEventListener("change",()=>{
+  selectedAnswers[q.id]=Number(input.value);
+ });
+});
  document.getElementById("feedback").innerHTML=
  checked[q.id]?feedbackHTML(q):"";
 
@@ -325,8 +329,11 @@ function checkAnswer(){
 
 function move(step){
  if(index===questions.length-1&&step===1){
-  const total=Object.keys(checked).length;
-  const correct=Object.values(checked).filter(x=>x.correct).length;
+  const total=Object.keys(selectedAnswers).length;
+  const correct=Object.entries(selectedAnswers).filter(([id,choice])=>{
+ const q=questions.find(x=>x.id===id);
+ return q && isCorrect(q,choice);
+}).length;
   document.getElementById("practice").innerHTML=
    '<h2>Practice Completed</h2><p>Attempted: '+total+
    ' / '+questions.length+'</p><p>Correct answers: <strong>'+
