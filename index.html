@@ -255,14 +255,20 @@ function getOptions(q){
  if(o&&typeof o==="object") return Object.values(o);
  return [];
 }
-
+function cleanQuestionText(text){
+ return String(text||"")
+  .replace(/https?:\/\/\S+|www\.\S+|\bdoctutorial(?:\.[a-z]{2,})+(?:\/\S*)?/gi,"")
+  .replace(/[ \t]{2,}/g," ")
+  .replace(/\n{3,}/g,"\n\n")
+  .trim();
+}
 function renderQuestion(){
  const q=questions[index];
 
  document.getElementById("progress").textContent=
  "Question "+(index+1)+" of "+questions.length;
  document.getElementById("examTag").textContent=q.exam+" · "+q.exam_year;
- document.getElementById("question").textContent=q.question_text||"Question unavailable";
+ document.getElementById("question").textContent=cleanQuestionText(q.question_text)||"Question unavailable";
 
  const media=q.media.length?q.media:[];
  document.getElementById("images").innerHTML=media.map(m=>{
