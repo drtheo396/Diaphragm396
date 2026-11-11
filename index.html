@@ -231,7 +231,7 @@ async function startPractice(){
   questions=data.map(q=>({...q,media:mediaMap[q.id]||[]}));
   index=0;
   checked={};
-
+selectedAnswers={};
   document.getElementById("filters").style.display="none";
   document.getElementById("practice").style.display="block";
   status(questions.length+" questions loaded.");
