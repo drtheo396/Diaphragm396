@@ -276,7 +276,7 @@ function renderQuestion(){
  document.getElementById("question").textContent=String(q.question_text??"NULL FROM DATABASE");
  const media=q.media.length?q.media:(q.image_file?[{file_path:q.image_file}]:[]);
 document.getElementById("images").innerHTML=media.map(m=>{
- const path=m.file_path.split("/").map(encodeURIComponent).join("/");
+const media=q.image_file?[{file_path:q.image_file}]:q.media;
  return '<img class="qimage" loading="lazy" alt="Question image" src="'+SUPABASE_URL+'/storage/v1/object/public/'+encodeURIComponent(BUCKET)+'/'+path+'">';
 }).join("");
  const chosen=checked[q.id]?.choice ?? selectedAnswers[q.id];
