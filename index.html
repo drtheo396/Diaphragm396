@@ -273,7 +273,7 @@ function renderQuestion(){
  document.getElementById("progress").textContent=
  "Question "+(index+1)+" of "+questions.length;
  document.getElementById("examTag").textContent=q.exam+" · "+q.exam_year;
- document.getElementById("question").textContent=cleanQuestionText(q.question_text)||"Question unavailable";
+ document.getElementById("question").textContent=String(q.question_text??"NULL FROM DATABASE");
  const media=q.media.length?q.media:[];
  document.getElementById("images").innerHTML=media.map(m=>{
   const path=m.file_path.split("/").map(encodeURIComponent).join("/");
