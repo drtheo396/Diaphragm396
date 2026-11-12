@@ -167,18 +167,22 @@ document.addEventListener("change",updateCounts);
 function status(message){
  document.getElementById("status").textContent=message;
 }
+
 async function startPractice(){
  const exam=document.getElementById("exam").value;
  const subjectIds=[...document.querySelectorAll(".subject:checked")].map(x=>Number(x.value));
  const selectedYears=[...document.querySelectorAll(".year:checked")].map(x=>Number(x.value));
+
  if(!exam||!subjectIds.length||!selectedYears.length){
   alert("Please select examination, subjects and years.");
   return;
  }
+
  const btn=document.getElementById("startBtn");
  btn.disabled=true;
  btn.textContent="Loading Questions...";
  status("Connecting to question bank...");
+
  try{
   let query=db.from("questions")
    .select("id,exam,exam_year,subject_id,topic,question_text,options,correct_answer,answer_format,explanation,image_file,image_status")
@@ -186,33 +190,54 @@ async function startPractice(){
    .in("exam_year",selectedYears)
    .order("exam_year",{ascending:false})
    .limit(500);
+
   if(exam!=="Both") query=query.eq("exam",exam);
   else query=query.in("exam",["NEET-PG","INI-CET"]);
+
   const {data,error}=await query;
   if(error) throw error;
+
   if(!data||!data.length){
    status("No questions found. Try different filters.");
    return;
   }
-  const ids=data.map(q=>q.id);
-  const {data:media,error:mediaError}=await db.from("question_media")
-   .select("question_id,file_path,media_type,display_order")
-   .in("question_id",ids)
-   .order("display_order");
-  if(mediaError) console.warn(mediaError.message);
-  const mediaMap={};
-  (media||[]).forEach(m=>{
-   if(!mediaMap[m.question_id]) mediaMap[m.question_id]=[];
-   mediaMap[m.question_id].push(m);
-  });
-  questions=data.map(q=>({...q,media:mediaMap[q.id]||[]}));
+
+  questions=data.map(q=>({...q,media:[]}));
   index=0;
   checked={};
   selectedAnswers={};
+
   document.getElementById("filters").style.display="none";
   document.getElementById("practice").style.display="block";
-  status(questions.length+" questions loaded.");
+  status(questions.length+" questions loaded. Loading images...");
   renderQuestion();
+
+  const ids=data.map(q=>q.id);
+
+  (async()=>{
+   try{
+    const {data:media,error:mediaError}=await db.from("question_media")
+     .select("question_id,file_path,media_type,display_order")
+     .in("question_id",ids)
+     .order("display_order");
+
+    if(mediaError) throw mediaError;
+
+    const mediaMap={};
+    (media||[]).forEach(m=>{
+     if(!mediaMap[m.question_id]) mediaMap[m.question_id]=[];
+     mediaMap[m.question_id].push(m);
+    });
+
+    questions=data.map(q=>({...q,media:mediaMap[q.id]||[]}));
+    renderQuestion();
+    status(questions.length+" questions loaded.");
+   }catch(e){
+    console.error("Image loading error:",e);
+    status(questions.length+" questions loaded. Images could not be loaded.");
+   }
+  })();
+
  }catch(e){
   console.error(e);
   status("Could not load questions: "+e.message);
@@ -221,6 +246,7 @@ async function startPractice(){
   btn.textContent="START PRACTICE";
  }
 }
+ 
 function getOptions(q){
  let o=q.options;
  if(typeof o==="string"){
