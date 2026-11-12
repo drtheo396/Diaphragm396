@@ -214,7 +214,12 @@ async function startPractice(){
    return;
   }
 
-  questions=data.map(q=>({...q}));
+  const ids=data.map(q=>q.id);
+const {data:media,error:mediaError}=await db.from("question_media").select("question_id,file_path,media_type,display_order").in("question_id",ids).order("display_order");
+if(mediaError) console.warn(mediaError.message);
+const mediaMap={};
+(media||[]).forEach(m=>{if(!mediaMap[m.question_id]) mediaMap[m.question_id]=[];mediaMap[m.question_id].push(m);});
+questions=data.map(q=>({...q,media:mediaMap[q.id]||[]}));
   index=0;
   checked={};
 selectedAnswers={};
@@ -254,10 +259,11 @@ function cleanQuestionText(text){
 function renderQuestion(){
  const q=questions[index];
 
- document.getElementById("progress").textContent=
- "Question "+(index+1)+" of "+questions.length;
- document.getElementById("examTag").textContent=q.exam+" · "+q.exam_year;
- document.getElementById("question").textContent=cleanQuestionText(q.question_text)||"Question unavailable";
+ const media=q.media.length?q.media:[];
+document.getElementById("images").innerHTML=media.map(m=>{
+ const path=m.file_path.split("/").map(encodeURIComponent).join("/");
+ return '<img class="qimage" loading="lazy" alt="Question image" src="'+SUPABASE_URL+'/storage/v1/object/public/'+encodeURIComponent(BUCKET)+'/'+path+'">';
+}).join("");
 
  const imagePaths=String(q.image_file||"").split(";").map(p=>p.trim()).filter(Boolean);
 document.getElementById("images").innerHTML=imagePaths.map(path=>{
