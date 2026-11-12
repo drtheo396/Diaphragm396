@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,7 +46,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <h1>MedMCQ</h1>
 <p>Focused practice for NEET-PG &amp; INI-CET</p>
 </header>
-
 <main class="container">
 <section id="filters">
 <div class="card">
@@ -57,7 +57,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <option value="Both">Both Examinations</option>
 </select>
 </div>
-
 <div class="card">
 <h2>2. Select Subjects</h2>
 <div class="tools">
@@ -67,7 +66,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <div class="grid" id="subjects"></div>
 <p class="hint" id="subjectCount">0 subjects selected</p>
 </div>
-
 <div class="card">
 <h2>3. Select Examination Years</h2>
 <div class="tools">
@@ -78,12 +76,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
 <div class="grid" id="years"></div>
 <p class="hint" id="yearCount">0 years selected</p>
 </div>
-
 <div class="card">
 <button class="primary wide" id="startBtn" onclick="startPractice()">START PRACTICE</button>
 </div>
 </section>
-
 <section id="practice" class="card">
 <div class="qtop">
 <span id="progress"></span>
@@ -102,14 +98,12 @@ button:disabled{opacity:.45;cursor:not-allowed}
 </section>
 <p id="status" role="status"></p>
 </main>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL="https://cdpunqgwxnajuopzqkmw.supabase.co";
 const SUPABASE_KEY="sb_publishable_eQ8g81J4yDSI3KSCHVE6dA_auwEFRpa";
 const BUCKET="question images";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
 const subjectList=[
 ["Anatomy",1],["Physiology",2],["Biochemistry",3],
 ["Pathology",4],["Pharmacology",5],["Microbiology",6],
@@ -119,14 +113,12 @@ const subjectList=[
 ["Orthopaedics",15],["Dermatology",16],["Psychiatry",17],
 ["Anaesthesia",18],["Radiology",19]
 ];
-
 let questions=[];
 let index=0;
 let checked={};
 let selectedAnswers={};
 const subjectBox=document.getElementById("subjects");
 const yearBox=document.getElementById("years");
-
 subjectList.forEach(([name,id])=>{
  const label=document.createElement("label");
  const input=document.createElement("input");
@@ -136,7 +128,6 @@ subjectList.forEach(([name,id])=>{
  label.append(input,document.createTextNode(name));
  subjectBox.append(label);
 });
-
 for(let year=2017;year<=2026;year++){
  const label=document.createElement("label");
  const input=document.createElement("input");
@@ -146,14 +137,12 @@ for(let year=2017;year<=2026;year++){
  label.append(input,document.createTextNode(year));
  yearBox.append(label);
 }
-
 function updateCounts(){
  document.getElementById("subjectCount").textContent=
  document.querySelectorAll(".subject:checked").length+" subjects selected";
  document.getElementById("yearCount").textContent=
  document.querySelectorAll(".year:checked").length+" years selected";
 }
-
 function selectCount(n){
  document.querySelectorAll(".subject").forEach((b,i)=>b.checked=i<n);
  updateCounts();
@@ -175,26 +164,21 @@ function clearYears(){
  updateCounts();
 }
 document.addEventListener("change",updateCounts);
-
 function status(message){
  document.getElementById("status").textContent=message;
 }
-
 async function startPractice(){
  const exam=document.getElementById("exam").value;
  const subjectIds=[...document.querySelectorAll(".subject:checked")].map(x=>Number(x.value));
  const selectedYears=[...document.querySelectorAll(".year:checked")].map(x=>Number(x.value));
-
  if(!exam||!subjectIds.length||!selectedYears.length){
   alert("Please select examination, subjects and years.");
   return;
  }
-
  const btn=document.getElementById("startBtn");
  btn.disabled=true;
  btn.textContent="Loading Questions...";
  status("Connecting to question bank...");
-
  try{
   let query=db.from("questions")
    .select("id,exam,exam_year,subject_id,topic,question_text,options,correct_answer,answer_format,explanation,image_file,image_status")
@@ -202,32 +186,33 @@ async function startPractice(){
    .in("exam_year",selectedYears)
    .order("exam_year",{ascending:false})
    .limit(500);
-
   if(exam!=="Both") query=query.eq("exam",exam);
   else query=query.in("exam",["NEET-PG","INI-CET"]);
-
   const {data,error}=await query;
   if(error) throw error;
-
   if(!data||!data.length){
    status("No questions found. Try different filters.");
    return;
   }
-
   const ids=data.map(q=>q.id);
-const {data:media,error:mediaError}=await db.from("question_media").select("question_id,file_path,media_type,display_order").in("question_id",ids).order("display_order");
-if(mediaError) console.warn(mediaError.message);
-const mediaMap={};
-(media||[]).forEach(m=>{if(!mediaMap[m.question_id]) mediaMap[m.question_id]=[];mediaMap[m.question_id].push(m);});
-questions=data.map(q=>({...q,media:mediaMap[q.id]||[]}));
+  const {data:media,error:mediaError}=await db.from("question_media")
+   .select("question_id,file_path,media_type,display_order")
+   .in("question_id",ids)
+   .order("display_order");
+  if(mediaError) console.warn(mediaError.message);
+  const mediaMap={};
+  (media||[]).forEach(m=>{
+   if(!mediaMap[m.question_id]) mediaMap[m.question_id]=[];
+   mediaMap[m.question_id].push(m);
+  });
+  questions=data.map(q=>({...q,media:mediaMap[q.id]||[]}));
   index=0;
   checked={};
-selectedAnswers={};
+  selectedAnswers={};
   document.getElementById("filters").style.display="none";
   document.getElementById("practice").style.display="block";
   status(questions.length+" questions loaded.");
   renderQuestion();
-
  }catch(e){
   console.error(e);
   status("Could not load questions: "+e.message);
@@ -236,7 +221,6 @@ selectedAnswers={};
   btn.textContent="START PRACTICE";
  }
 }
-
 function getOptions(q){
  let o=q.options;
  if(typeof o==="string"){
@@ -258,56 +242,44 @@ function cleanQuestionText(text){
 }
 function renderQuestion(){
  const q=questions[index];
-
+ document.getElementById("progress").textContent=
+ "Question "+(index+1)+" of "+questions.length;
+ document.getElementById("examTag").textContent=q.exam+" · "+q.exam_year;
+ document.getElementById("question").textContent=cleanQuestionText(q.question_text)||"Question unavailable";
  const media=q.media.length?q.media:[];
-document.getElementById("images").innerHTML=media.map(m=>{
- const path=m.file_path.split("/").map(encodeURIComponent).join("/");
- return '<img class="qimage" loading="lazy" alt="Question image" src="'+SUPABASE_URL+'/storage/v1/object/public/'+encodeURIComponent(BUCKET)+'/'+path+'">';
-}).join("");
-
- const imagePaths=String(q.image_file||"").split(";").map(p=>p.trim()).filter(Boolean);
-document.getElementById("images").innerHTML=imagePaths.map(path=>{
- const {data}=db.storage.from(BUCKET).getPublicUrl(path);
- return '<img class="qimage" loading="lazy" alt="Question image" src="'+data.publicUrl+'">';
-}).join("");
-
+ document.getElementById("images").innerHTML=media.map(m=>{
+  const path=m.file_path.split("/").map(encodeURIComponent).join("/");
+  return '<img class="qimage" loading="lazy" alt="Question image" src="'+SUPABASE_URL+'/storage/v1/object/public/'+encodeURIComponent(BUCKET)+'/'+path+'">';
+ }).join("");
  const chosen=checked[q.id]?.choice ?? selectedAnswers[q.id];
  document.getElementById("options").innerHTML=getOptions(q).map((opt,i)=>
   '<label class="option"><input type="radio" name="answer" value="'+i+'" '+(chosen===i?"checked":"")+' '+(checked[q.id]?"disabled":"")+'><span></span></label>'
  ).join("");
-
  const optionLabels=document.querySelectorAll("#options .option span");
  getOptions(q).forEach((opt,i)=>optionLabels[i].textContent=opt);
-document.querySelectorAll('input[name="answer"]').forEach(input=>{
- input.addEventListener("change",()=>{
-  selectedAnswers[q.id]=Number(input.value);
+ document.querySelectorAll('input[name="answer"]').forEach(input=>{
+  input.addEventListener("change",()=>{
+   selectedAnswers[q.id]=Number(input.value);
+  });
  });
-});
  document.getElementById("feedback").innerHTML=
  checked[q.id]?feedbackHTML(q):"";
-
  document.getElementById("checkBtn").disabled=!!checked[q.id];
  document.getElementById("prevBtn").disabled=index===0;
  document.getElementById("nextBtn").textContent=
  index===questions.length-1?"Finish":"Next →";
-
  document.getElementById("questionMeta").textContent=q.topic||"";
 }
-
 function isCorrect(q,choice){
  const opts=getOptions(q);
  const selected=String(opts[choice]).trim().toLowerCase();
  const answer=q.correct_answer;
-
  if(Array.isArray(answer))
   return answer.some(a=>String(a).trim().toLowerCase()===selected);
-
  if(answer&&typeof answer==="object")
   return Object.values(answer).some(a=>String(a).trim().toLowerCase()===selected);
-
  return String(answer??"").trim().toLowerCase()===selected;
 }
-
 function feedbackHTML(q){
  const ok=checked[q.id].correct;
  return '<div class="feedback '+(ok?"correct":"incorrect")+'"><strong>'+
@@ -315,7 +287,6 @@ function feedbackHTML(q){
  String(q.correct_answer??"Not provided")+
  (q.explanation?'<br><br>'+q.explanation:"")+'</div>';
 }
-
 function checkAnswer(){
  const q=questions[index];
  const selected=document.querySelector('input[name="answer"]:checked');
@@ -327,14 +298,13 @@ function checkAnswer(){
  checked[q.id]={choice,correct:isCorrect(q,choice)};
  renderQuestion();
 }
-
 function move(step){
  if(index===questions.length-1&&step===1){
   const total=Object.keys(selectedAnswers).length;
   const correct=Object.entries(selectedAnswers).filter(([id,choice])=>{
- const q=questions.find(x=>x.id===id);
- return q && isCorrect(q,choice);
-}).length;
+   const q=questions.find(x=>x.id===id);
+   return q && isCorrect(q,choice);
+  }).length;
   document.getElementById("practice").innerHTML=
    '<h2>Practice Completed</h2><p>Attempted: '+total+
    ' / '+questions.length+'</p><p>Correct answers: <strong>'+
