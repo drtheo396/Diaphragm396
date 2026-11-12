@@ -194,7 +194,7 @@ async function startPractice(){
   if(exam!=="Both") query=query.eq("exam",exam);
   else query=query.in("exam",["NEET-PG","INI-CET"]);
 
-  const {data,error}=await query;
+  const {data,error}=await Promise.race([query,{then:(_,reject)=>setTimeout(()=>reject(new Error("Supabase request timed out after 12 seconds")),12000)}]);
   if(error) throw error;
 
   if(!data||!data.length){
