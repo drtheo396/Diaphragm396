@@ -260,7 +260,7 @@ function getOptions(q){
 function cleanQuestionText(text){
  return String(text||"")
   .replace(/https?:\/\/\S+|www\.\S+|\bdoctutorial(?:\.[a-z]{2,})+(?:\/\S*)?/gi,"")
-  .replace(/click\s+here\s+to\s+explore\s+more\s+(?:surgery\s+)?pyqs/gi,"")
+  .replace(/click\s+here\s+to\s+explore\s+more\s+(?:[a-z]+\s+)?pyqs/gi,"")
   .replace(/\b7097434567\b|\b7097634567\b/g,"")
   .replace(/[˜]/g,"")
   .replace(/[ \t]{2,}/g," ")
